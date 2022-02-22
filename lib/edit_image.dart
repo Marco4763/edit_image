@@ -60,9 +60,7 @@ class _EditImageState extends State<EditImage> {
               join(dir, "screenshot${DateTime.now().toIso8601String()}.png");
           File imgFile = File(path);
           imgFile.writeAsBytes(pngBytes).then((value) {
-            setState(() {
               widget.savedImage!(value);
-            });
           }).catchError((onError) {
             print(onError);
           });

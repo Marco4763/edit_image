@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
       home: EditImage(
         controller: controller,
         savedImage: (value){
-          Navigator.pop(context);
           print("Pic $value");
+          Navigator.pop(context);
         },
       ),
     );
