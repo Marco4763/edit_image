@@ -11,6 +11,8 @@ class EditImageController extends ChangeNotifier {
   final String? src;
   final ImageType? imageType;
   final BuildContext? context;
+  double imageWidth = 0.0;
+  double imageHeight = 0.0;
 
   @override
   notifyListeners() {

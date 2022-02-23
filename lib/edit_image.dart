@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:edit_image/controller/edit_image_controller.dart';
 import 'package:edit_image/resources/size.resources.dart';
+import 'package:edit_image/widgets/drag.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path/path.dart';
@@ -29,16 +30,18 @@ class EditImage extends StatefulWidget {
 }
 
 class _EditImageState extends State<EditImage> {
-  Offset? imagePosition = Offset.zero;
-  double imageWidth = 0.0;
-  double imageHeight = 0.0;
   double sliderValue = 10.0;
   Color colorFilter = Colors.transparent;
-  List<Color> filterColors = [Colors.transparent, Color(0xffFFE1FF), Color(0xff63B8FF ), Color(0xffE3E3E3 ), ];
-  List<String> filterTitle = ["Sem Filtro", "Ameixa", "Azul Claro", "Preto e Branco"];
+  List<Color> filterColors = [
+    Colors.transparent,
+    Color(0xff708090),
+    ...List.generate(
+      Colors.primaries.length,
+          (index) => Colors.primaries[(index * 10) % Colors.primaries.length],
+    )
+  ];
   Color selectedColor = Colors.transparent;
   GlobalKey? globalKey = GlobalKey();
-  bool? draggingEnded = true;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +63,7 @@ class _EditImageState extends State<EditImage> {
               join(dir, "screenshot${DateTime.now().toIso8601String()}.png");
           File imgFile = File(path);
           imgFile.writeAsBytes(pngBytes).then((value) {
-              widget.savedImage!(value);
+            widget.savedImage!(value);
           }).catchError((onError) {
             print(onError);
           });
@@ -105,38 +108,16 @@ class _EditImageState extends State<EditImage> {
                             child: SizedBox(
                               width: width(context),
                               height: height(context),
-                              child: ColorFiltered(colorFilter: ColorFilter.mode(selectedColor, BlendMode.color), child: getImageForBackground(),),
+                              child: ColorFiltered(
+                                colorFilter: ColorFilter.mode(selectedColor == Colors.transparent || selectedColor == Color(0xff708090)? selectedColor : selectedColor.withOpacity(0.5), BlendMode.color),
+                                child: getImageForBackground(),
+                              ),
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: imagePosition!.dy - 100 + 20,
-                          left: imagePosition!.dx,
-                          child: Draggable(
-                            feedback: SizedBox(
-                                width: imageWidth,
-                                height: imageHeight,
-                                child: ColorFiltered(colorFilter: ColorFilter.mode(selectedColor, BlendMode.color), child: getImagePreview(),)),
-                            child: Visibility(
-                              visible: draggingEnded!,
-                              child: SizedBox(
-                                  width: imageWidth,
-                                  height: imageHeight,
-                                  child: ColorFiltered(colorFilter: ColorFilter.mode(selectedColor, BlendMode.color), child: getImagePreview(),)),
-                            ),
-                            onDragStarted: () {
-                              setState(() {
-                                draggingEnded = false;
-                              });
-                            },
-                            onDraggableCanceled: (vertical, offset) {
-                              setState(() {
-                                print(imageWidth);
-                                draggingEnded = true;
-                                imagePosition = offset;
-                              });
-                            },
-                          ),
+                        DragWidget(
+                          controller: widget.controller,
+                          selectedColor: selectedColor,
                         ),
                       ],
                     ),
@@ -154,7 +135,7 @@ class _EditImageState extends State<EditImage> {
           children: [
             SizedBox(height: height(context) * .02),
             const Text(
-              "Opções",
+              "Filtros",
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -162,94 +143,48 @@ class _EditImageState extends State<EditImage> {
               ),
             ),
             SizedBox(height: height(context) * .02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                cardButton(
-                  label: "Zoom",
-                  icon: Icons.zoom_out_map,
-                  clickAction: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return SizedBox(
-                          width: width(context),
-                          height: 50,
-                          child: StatefulBuilder(
-                            builder: (context, state) => Slider(
-                              value: sliderValue,
-                              min: 10,
-                              max: 1000,
-                              divisions: 100,
-                              activeColor: Colors.red,
-                              label: sliderValue.toInt().toString(),
-                              onChanged: (double value) {
-                                if (value > sliderValue) {
-                                  setState(() {
-                                    imageWidth = imageWidth + 10;
-                                    imageHeight = imageHeight + 10;
-                                  });
-                                } else {
-                                  if(imageWidth >= (1060 / pixelRatio(context))){
-                                    setState(() {
-                                      imageWidth = imageWidth - 12;
-                                      imageHeight = imageHeight - 12;
-                                    });
-                                  }
-                                }
-                                state(() {
-                                  sliderValue = value;
-                                });
-                              },
-                            )),
-                        );
+            SizedBox(
+              width: width(context),
+              height: 130,
+              child: ListView.builder(
+                itemCount: filterColors.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  return SizedBox(
+                    width: width(context)*.28,
+                    height: 50,
+                    child: ListTile(
+                      onTap: () {
+                        setState(() {
+                          selectedColor = filterColors[index];
+                        });
                       },
-                    );
-                  },
-                ),
-                cardButton(
-                  label: "Filtro",
-                  icon: Icons.filter_hdr_outlined,
-                  clickAction: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return SizedBox(
-                          width: width(context),
-                          height: 100,
-                          child: GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-                            itemCount: filterColors.length,
-                            itemBuilder: (context, index){
-                              return ListTile(
-                                onTap: (){
-                                  setState(() {
-                                    selectedColor = filterColors[index];
-                                  });
-                                },
-                                title: Card(
-                                  color: filterColors[index],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(80.0)
-                                  ),
-                                  child: SizedBox(width: 60, height: 60,),
-                                ),
-                                subtitle: Text(filterTitle[index], textAlign: TextAlign.center,),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  },
-                )
-              ],
+                      title: Card(
+                        color: filterColors[index],
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(80.0)),
+                        child: Padding(padding: EdgeInsets.all(35.0)),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-            SizedBox(height: height(context) * .02),
           ],
         ),
       ),
     );
+  }
+
+  void getScreenDimensions(BuildContext context) {
+    if (widget.controller!.imageWidth == 0.0 &&
+        widget.controller!.imageHeight == 0.0) {
+      setState(() {
+        widget.controller!.imageWidth = (1060 / pixelRatio(context));
+        widget.controller!.imageHeight = (1920 / pixelRatio(context));
+      });
+    }
   }
 
   Widget getImageForBackground() {
@@ -281,53 +216,25 @@ class _EditImageState extends State<EditImage> {
     }
   }
 
-  void getScreenDimensions(BuildContext context) {
-    if (imageWidth == 0.0 && imageHeight == 0.0) {
-      imageWidth = (1060 / pixelRatio(context));
-      imageHeight = (1920 / pixelRatio(context));
-    }
-  }
-
-  Widget getImagePreview() {
-    switch (widget.controller!.imageType) {
-      case ImageType.asset:
-        return Image.asset(
-          widget.controller!.src!,
-          fit: BoxFit.contain,
-        );
-        break;
-      case ImageType.file:
-        return Image.file(
-          File(widget.controller!.src!),
-          fit: BoxFit.contain,
-        );
-        break;
-      case ImageType.network:
-        return Image.network(
-          widget.controller!.src!,
-          fit: BoxFit.contain,
-        );
-        break;
-      default:
-        return Container();
-        break;
-    }
-  }
-
-  Widget cardButton(
-      {@required String? label,
-      @required IconData? icon,
-      @required Function()? clickAction}) {
+  Widget cardButton({
+    @required String? label,
+    @required IconData? icon,
+    Color? sideColor = Colors.black,
+    @required Function()? clickAction,
+  }) {
     return GestureDetector(
       onTap: clickAction!,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Card(
-            elevation: 10.0,
+            elevation: 0.0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(80.0),
-            ),
+                borderRadius: BorderRadius.circular(80.0),
+                side: BorderSide(
+                  color: sideColor!,
+                  width: 1.0,
+                )),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(icon!),
