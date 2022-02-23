@@ -34,7 +34,7 @@ class _EditImageState extends State<EditImage> {
   Color colorFilter = Colors.transparent;
   List<Color> filterColors = [
     Colors.transparent,
-    Color(0xff708090),
+    const Color(0xff708090),
     ...List.generate(
       Colors.primaries.length,
           (index) => Colors.primaries[(index * 10) % Colors.primaries.length],
@@ -64,8 +64,6 @@ class _EditImageState extends State<EditImage> {
           File imgFile = File(path);
           imgFile.writeAsBytes(pngBytes).then((value) {
             widget.savedImage!(value);
-          }).catchError((onError) {
-            print(onError);
           });
         },
         child: Icon(
@@ -102,14 +100,14 @@ class _EditImageState extends State<EditImage> {
                           height: (1920 / pixelRatio(context)) - 80,
                           child: ImageFiltered(
                             imageFilter: ui.ImageFilter.blur(
-                              sigmaX: 5.0,
-                              sigmaY: 5.0,
+                              sigmaX: 50.0,
+                              sigmaY: 50.0,
                             ),
                             child: SizedBox(
                               width: width(context),
                               height: height(context),
                               child: ColorFiltered(
-                                colorFilter: ColorFilter.mode(selectedColor == Colors.transparent || selectedColor == Color(0xff708090)? selectedColor : selectedColor.withOpacity(0.5), BlendMode.color),
+                                colorFilter: ColorFilter.mode(selectedColor == Colors.transparent || selectedColor == const Color(0xff708090)? selectedColor : selectedColor.withOpacity(0.5), BlendMode.color),
                                 child: getImageForBackground(),
                               ),
                             ),
@@ -164,7 +162,7 @@ class _EditImageState extends State<EditImage> {
                         shape: RoundedRectangleBorder(
                             borderRadius:
                             BorderRadius.circular(80.0)),
-                        child: Padding(padding: EdgeInsets.all(35.0)),
+                        child: const Padding(padding: EdgeInsets.all(35.0)),
                       ),
                     ),
                   );
@@ -194,25 +192,21 @@ class _EditImageState extends State<EditImage> {
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
       case ImageType.file:
         return Image.file(
           File(widget.controller!.src!),
           fit: BoxFit.cover,
         );
-        break;
       case ImageType.network:
         return Image.network(
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
       default:
         return Image.network(
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
     }
   }
 

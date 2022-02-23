@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 import 'package:edit_image/controller/edit_image_controller.dart';
-import 'package:edit_image/resources/size.resources.dart';
 import 'package:flutter/material.dart';
 
 class DragWidget extends StatefulWidget {
@@ -64,18 +63,10 @@ class _DragWidgetState extends State<DragWidget> {
           height: widget.controller!.imageHeight,
           child: ColorFiltered(
             colorFilter:
-            ColorFilter.mode(widget.selectedColor == Colors.transparent || widget.selectedColor == Color(0xff708090)? widget.selectedColor : widget.selectedColor.withOpacity(0.5), BlendMode.color),
+            ColorFilter.mode(widget.selectedColor == Colors.transparent || widget.selectedColor == const Color(0xff708090)? widget.selectedColor : widget.selectedColor.withOpacity(0.5), BlendMode.color),
             child: getImagePreview(),
           )),
     );
-  }
-
-  double getDyPosition() {
-    if (height(context) > 785) {
-      return -47;
-    } else {
-      return -23;
-    }
   }
 
   Widget getImagePreview() {
@@ -85,22 +76,18 @@ class _DragWidgetState extends State<DragWidget> {
           widget.controller!.src!,
           fit: BoxFit.contain,
         );
-        break;
       case ImageType.file:
         return Image.file(
           File(widget.controller!.src!),
           fit: BoxFit.contain,
         );
-        break;
       case ImageType.network:
         return Image.network(
           widget.controller!.src!,
           fit: BoxFit.contain,
         );
-        break;
       default:
         return Container();
-        break;
     }
   }
 
@@ -111,25 +98,21 @@ class _DragWidgetState extends State<DragWidget> {
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
       case ImageType.file:
         return Image.file(
           File(widget.controller!.src!),
           fit: BoxFit.cover,
         );
-        break;
       case ImageType.network:
         return Image.network(
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
       default:
         return Image.network(
           widget.controller!.src!,
           fit: BoxFit.cover,
         );
-        break;
     }
   }
 }

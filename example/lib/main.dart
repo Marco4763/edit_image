@@ -2,7 +2,7 @@ import 'package:edit_image/controller/edit_image_controller.dart';
 import 'package:edit_image/edit_image.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var controller = EditImageController(
       src:
-          "https://www.slazzer.com/static/images/home-page/banner-orignal-image.jpg",
+          "https://pagesix.com/wp-content/uploads/sites/3/2014/06/168286248.jpg?quality=80&strip=all&w=900",
       imageType: ImageType.network,
       context: context,
     );
@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
       home: EditImage(
         controller: controller,
         savedImage: (value){
-          print("Pic $value");
           Navigator.pop(context);
         },
       ),
