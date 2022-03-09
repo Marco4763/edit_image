@@ -19,6 +19,7 @@ class EditImage extends StatefulWidget {
   final int widthPx;
   final int heightPx;
   final Function(File)? savedImage;
+  final Widget? appBar;
 
   const EditImage({
     Key? key,
@@ -28,6 +29,7 @@ class EditImage extends StatefulWidget {
     this.widthPx = 1060,
     this.heightPx = 1920,
     this.savedImage,
+    this.appBar,
   }) : super(key: key);
 
   @override
@@ -192,7 +194,11 @@ class _EditImageState extends State<EditImage> {
         ),
         backgroundColor: widget.floatingActionButtonColor,
       ),
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: Colors.grey.shade200,
+      appBar: PreferredSize(
+        child: SafeArea(child: getAppBar()),
+        preferredSize: Size.fromHeight(50),
+      ),
       body: SafeArea(
         child: Align(
           alignment: Alignment.topCenter,
@@ -258,18 +264,76 @@ class _EditImageState extends State<EditImage> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.white,
+        color: Colors.grey.shade300,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: height(context) * .02),
-            const Text(
-              "Filtros",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      filterPage = 0;
+                    });
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.grey.shade300)
+                    ),
+                    child: SizedBox(
+                      width: 100,
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Icon(Icons.settings_input_composite_rounded, color: filterPage == 0 ? Colors.black : Colors.grey,),
+                          Text(
+                            "Filtros",
+                            style: TextStyle(
+                              color: filterPage == 0 ? Colors.black : Colors.grey,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      filterPage = 1;
+                    });
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.grey.shade300)
+                    ),
+                    child: SizedBox(
+                      width: 100,
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Icon(Icons.palette_rounded, color: filterPage == 1 ? Colors.black : Colors.grey,),
+                          Text(
+                            "Cores",
+                            style: TextStyle(
+                              color: filterPage == 1 ? Colors.black : Colors.grey,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
             SizedBox(height: height(context) * .02),
             SizedBox(
@@ -281,6 +345,14 @@ class _EditImageState extends State<EditImage> {
         ),
       ),
     );
+  }
+
+  Widget getAppBar(){
+    if(widget.appBar == null) {
+      return Container();
+    } else {
+      return widget.appBar!;
+    }
   }
 
   Widget getImagePreview() {
@@ -307,96 +379,79 @@ class _EditImageState extends State<EditImage> {
 
   Widget getFilters(BuildContext context){
     if(filterPage == 0){
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: width(context) / 1.15,
-            height: 100,
-            child: ListView.builder(
-              itemCount: filters.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedFilter = filters[index];
-                          });
-                        },
-                        child: SizedBox(
-                          width: 80,
-                          height: 80,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(80.0),
-                            child: ColorFiltered
-                              (
-                                colorFilter: ColorFilter.matrix(filters[index]),
-                                child: getImagePreview()),
-                          ),
-                        ),
-                      ),
+      return ListView.builder(
+        itemCount: filters.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedFilter = filters[index];
+                    });
+                  },
+                  child: SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(80.0),
+                      child: ColorFiltered
+                        (
+                          colorFilter: ColorFilter.matrix(filters[index]),
+                          child: getImagePreview()),
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-          IconButton(onPressed: (){
-            setState(() {
-              filterPage = 1;
-            });
-          }, icon: Icon(Icons.keyboard_arrow_right_rounded))
-        ],
+                  ),
+                ),
+              ),
+              Center(
+                child: Text("Filtro $index"),
+              )
+            ],
+          );
+        },
       );
     }else{
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          IconButton(onPressed: (){
-            setState(() {
-              filterPage = 0;
-            });
-          }, icon: Icon(Icons.keyboard_arrow_left_rounded),),
-          SizedBox(
-            width: width(context) / 1.15,
-            height: 100,
-            child: ListView.builder(
-              itemCount: filterColors.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedColor = filterColors[index];
-                          });
-                        },
-                        child: Card(
-                          color: filterColors[index],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(80.0)
-                          ),
-                          child: SizedBox(
-                            width: 75,
-                            height: 75,
-                          ),
+      return ListView.builder(
+        itemCount: filterColors.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedColor = filterColors[index];
+                    });
+                  },
+                  child: Card(
+                    color: filterColors[index],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(80.0)
+                    ),
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(80.0),
+                        child: ColorFiltered(
+                          colorFilter: ColorFilter.mode(
+                              filterColors[index],
+                              BlendMode.color),
+                          child: getImageForBackground(),
                         ),
                       ),
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       );
     }
   }
