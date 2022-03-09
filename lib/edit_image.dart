@@ -1,8 +1,9 @@
 library edit_image;
-
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:colorfilter_generator/addons.dart';
+import 'package:colorfilter_generator/colorfilter_generator.dart';
 import 'package:edit_image/controller/edit_image_controller.dart';
 import 'package:edit_image/resources/size.resources.dart';
 import 'package:edit_image/widgets/drag.widget.dart';
@@ -15,6 +16,8 @@ class EditImage extends StatefulWidget {
   final EditImageController? controller;
   final Color? floatingActionButtonColor;
   final Color? iconColor;
+  final int widthPx;
+  final int heightPx;
   final Function(File)? savedImage;
 
   const EditImage({
@@ -22,6 +25,8 @@ class EditImage extends StatefulWidget {
     @required this.controller,
     this.floatingActionButtonColor = Colors.red,
     this.iconColor = Colors.white,
+    this.widthPx = 1060,
+    this.heightPx = 1920,
     this.savedImage,
   }) : super(key: key);
 
@@ -32,14 +37,129 @@ class EditImage extends StatefulWidget {
 class _EditImageState extends State<EditImage> {
   double sliderValue = 10.0;
   Color colorFilter = Colors.transparent;
+  int filterPage = 0;
   List<Color> filterColors = [
     Colors.transparent,
     const Color(0xff708090),
     ...List.generate(
       Colors.primaries.length,
-          (index) => Colors.primaries[(index * 10) % Colors.primaries.length],
+      (index) => Colors.primaries[(index * 10) % Colors.primaries.length],
     )
   ];
+  List<List<double>> filters = [
+    ColorFilterGenerator(
+        name: "No Filter",
+        filters: [
+          ColorFilterAddons.brightness(0),
+          ColorFilterAddons.contrast(0),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 1",
+        filters: [
+          ColorFilterAddons.brightness(0),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 2",
+        filters: [
+          ColorFilterAddons.brightness(0.25),
+          ColorFilterAddons.contrast(0),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 3",
+        filters: [
+          ColorFilterAddons.brightness(0.25),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 4",
+        filters: [
+          ColorFilterAddons.brightness(-0.25),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 5",
+        filters: [
+          ColorFilterAddons.brightness(-0.075),
+          ColorFilterAddons.contrast(-0.25),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 6",
+        filters: [
+          ColorFilterAddons.brightness(0),
+          ColorFilterAddons.contrast(0),
+          ColorFilterAddons.saturation(0.25),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 7",
+        filters: [
+          ColorFilterAddons.brightness(0),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(-0.175),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 8",
+        filters: [
+          ColorFilterAddons.brightness(0.25),
+          ColorFilterAddons.contrast(0),
+          ColorFilterAddons.saturation(-1),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 9",
+        filters: [
+          ColorFilterAddons.brightness(0.25),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(-0.325),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 10",
+        filters: [
+          ColorFilterAddons.brightness(0),
+          ColorFilterAddons.contrast(0.5),
+          ColorFilterAddons.saturation(-0.20),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 11",
+        filters: [
+          ColorFilterAddons.brightness(-0.25),
+          ColorFilterAddons.contrast(0.25),
+          ColorFilterAddons.saturation(0.25),
+        ]
+    ).matrix,
+    ColorFilterGenerator(
+        name: "filter 12",
+        filters: [
+          ColorFilterAddons.brightness(-0.075),
+          ColorFilterAddons.contrast(-0.25),
+          ColorFilterAddons.saturation(0),
+        ]
+    ).matrix,
+  ];
+  List<double> selectedFilter = ColorFilterGenerator(
+      name: "No Filter",
+      filters: [
+        ColorFilterAddons.brightness(0),
+        ColorFilterAddons.contrast(0),
+        ColorFilterAddons.saturation(0),
+      ]
+  ).matrix;
   Color selectedColor = Colors.transparent;
   GlobalKey? globalKey = GlobalKey();
 
@@ -55,14 +175,14 @@ class _EditImageState extends State<EditImage> {
               .path;
           RenderRepaintBoundary boundary = globalKey!.currentContext!
               .findRenderObject() as RenderRepaintBoundary;
-          ui.Image image = await boundary.toImage();
+          ui.Image imageCreation = await boundary.toImage();
           ByteData? byteData =
-              await image.toByteData(format: ui.ImageByteFormat.png);
+              await imageCreation.toByteData(format: ui.ImageByteFormat.png);
           Uint8List pngBytes = byteData!.buffer.asUint8List();
           final path =
               join(dir, "screenshot${DateTime.now().toIso8601String()}.png");
           File imgFile = File(path);
-          imgFile.writeAsBytes(pngBytes).then((value) {
+          imgFile.writeAsBytes(pngBytes).then((value) async{
             widget.savedImage!(value);
           });
         },
@@ -91,13 +211,13 @@ class _EditImageState extends State<EditImage> {
                 child: RepaintBoundary(
                   key: globalKey,
                   child: SizedBox(
-                    width: (1060 / pixelRatio(context)),
-                    height: (1920 / pixelRatio(context)) - 80,
+                    width: (widget.widthPx / pixelRatio(context)),
+                    height: (widget.heightPx / pixelRatio(context)) - 80,
                     child: Stack(
                       children: [
                         SizedBox(
                           width: width(context),
-                          height: (1920 / pixelRatio(context)) - 80,
+                          height: (widget.heightPx / pixelRatio(context)) - 80,
                           child: ImageFiltered(
                             imageFilter: ui.ImageFilter.blur(
                               sigmaX: 50.0,
@@ -106,9 +226,19 @@ class _EditImageState extends State<EditImage> {
                             child: SizedBox(
                               width: width(context),
                               height: height(context),
-                              child: ColorFiltered(
-                                colorFilter: ColorFilter.mode(selectedColor == Colors.transparent || selectedColor == const Color(0xff708090)? selectedColor : selectedColor.withOpacity(0.5), BlendMode.color),
-                                child: getImageForBackground(),
+                              child: ColorFiltered
+                                (
+                                colorFilter: ColorFilter.matrix(selectedFilter),
+                                child: ColorFiltered(
+                                  colorFilter: ColorFilter.mode(
+                                      selectedColor == Colors.transparent ||
+                                              selectedColor ==
+                                                  const Color(0xff708090)
+                                          ? selectedColor
+                                          : selectedColor.withOpacity(0.5),
+                                      BlendMode.color),
+                                  child: getImageForBackground(),
+                                ),
                               ),
                             ),
                           ),
@@ -116,6 +246,7 @@ class _EditImageState extends State<EditImage> {
                         DragWidget(
                           controller: widget.controller,
                           selectedColor: selectedColor,
+                          selectedFilter: selectedFilter,
                         ),
                       ],
                     ),
@@ -144,30 +275,7 @@ class _EditImageState extends State<EditImage> {
             SizedBox(
               width: width(context),
               height: 130,
-              child: ListView.builder(
-                itemCount: filterColors.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return SizedBox(
-                    width: width(context)*.28,
-                    height: 50,
-                    child: ListTile(
-                      onTap: () {
-                        setState(() {
-                          selectedColor = filterColors[index];
-                        });
-                      },
-                      title: Card(
-                        color: filterColors[index],
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(80.0)),
-                        child: const Padding(padding: EdgeInsets.all(35.0)),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              child: getFilters(context),
             ),
           ],
         ),
@@ -175,12 +283,130 @@ class _EditImageState extends State<EditImage> {
     );
   }
 
+  Widget getImagePreview() {
+    switch (widget.controller!.imageType) {
+      case ImageType.asset:
+        return Image.asset(
+          widget.controller!.src!,
+          fit: BoxFit.cover,
+        );
+      case ImageType.file:
+        return Image.file(
+          File(widget.controller!.src!),
+          fit: BoxFit.cover,
+        );
+      case ImageType.network:
+        return Image.network(
+          widget.controller!.src!,
+          fit: BoxFit.cover,
+        );
+      default:
+        return Container();
+    }
+  }
+
+  Widget getFilters(BuildContext context){
+    if(filterPage == 0){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: width(context) / 1.15,
+            height: 100,
+            child: ListView.builder(
+              itemCount: filters.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedFilter = filters[index];
+                          });
+                        },
+                        child: SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(80.0),
+                            child: ColorFiltered
+                              (
+                                colorFilter: ColorFilter.matrix(filters[index]),
+                                child: getImagePreview()),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          IconButton(onPressed: (){
+            setState(() {
+              filterPage = 1;
+            });
+          }, icon: Icon(Icons.keyboard_arrow_right_rounded))
+        ],
+      );
+    }else{
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(onPressed: (){
+            setState(() {
+              filterPage = 0;
+            });
+          }, icon: Icon(Icons.keyboard_arrow_left_rounded),),
+          SizedBox(
+            width: width(context) / 1.15,
+            height: 100,
+            child: ListView.builder(
+              itemCount: filterColors.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedColor = filterColors[index];
+                          });
+                        },
+                        child: Card(
+                          color: filterColors[index],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(80.0)
+                          ),
+                          child: SizedBox(
+                            width: 75,
+                            height: 75,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
   void getScreenDimensions(BuildContext context) {
     if (widget.controller!.imageWidth == 0.0 &&
         widget.controller!.imageHeight == 0.0) {
       setState(() {
-        widget.controller!.imageWidth = (1060 / pixelRatio(context));
-        widget.controller!.imageHeight = (1920 / pixelRatio(context));
+        widget.controller!.imageWidth = (widget.widthPx / pixelRatio(context));
+        widget.controller!.imageHeight = (widget.heightPx / pixelRatio(context));
       });
     }
   }

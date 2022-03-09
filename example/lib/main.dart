@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var controller = EditImageController(
       src:
-          "https://pagesix.com/wp-content/uploads/sites/3/2014/06/168286248.jpg?quality=80&strip=all&w=900",
+          "https://www.slazzer.com/static/images/home-page/banner-orignal-image.jpg",
       imageType: ImageType.network,
       context: context,
     );
@@ -22,6 +22,8 @@ class MyApp extends StatelessWidget {
         savedImage: (value){
           Navigator.pop(context);
         },
+        widthPx: 1080,
+        heightPx: 1200,
       ),
     );
   }

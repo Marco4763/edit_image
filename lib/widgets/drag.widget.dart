@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 
 class DragWidget extends StatefulWidget {
   final EditImageController? controller;
+  final List<double>? selectedFilter;
   final Color selectedColor;
 
   const DragWidget({
     Key? key,
     @required this.controller,
     this.selectedColor = Colors.transparent,
+    this.selectedFilter,
   }) : super(key: key);
 
   @override
@@ -61,10 +63,18 @@ class _DragWidgetState extends State<DragWidget> {
       child: SizedBox(
           width: widget.controller!.imageWidth,
           height: widget.controller!.imageHeight,
-          child: ColorFiltered(
-            colorFilter:
-            ColorFilter.mode(widget.selectedColor == Colors.transparent || widget.selectedColor == const Color(0xff708090)? widget.selectedColor : widget.selectedColor.withOpacity(0.5), BlendMode.color),
-            child: getImagePreview(),
+          child: ColorFiltered
+            (
+            colorFilter: ColorFilter.matrix(widget.selectedFilter!),
+            child:  ColorFiltered(
+              colorFilter:
+              ColorFilter.mode(widget.selectedColor == Colors.transparent ||
+                  widget.selectedColor ==
+                      const Color(0xff708090)
+                  ? widget.selectedColor
+                  : widget.selectedColor.withOpacity(0.5), BlendMode.softLight),
+              child: getImagePreview(),
+            ),
           )),
     );
   }
