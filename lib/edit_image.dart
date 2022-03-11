@@ -441,7 +441,7 @@ class _EditImageState extends State<EditImage> {
                         child: ColorFiltered(
                           colorFilter: ColorFilter.mode(
                               filterColors[index],
-                              BlendMode.color),
+                              BlendMode.softLight),
                           child: getImageForBackground(),
                         ),
                       ),
