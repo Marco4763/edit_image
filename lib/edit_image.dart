@@ -60,7 +60,7 @@ class _EditImageState extends State<EditImage> {
                 .path;
             RenderRepaintBoundary boundary = widget.controller!.globalKey!.currentContext!
                 .findRenderObject() as RenderRepaintBoundary;
-            ui.Image imageCreation = await boundary.toImage(pixelRatio: 2.0);
+            ui.Image imageCreation = await boundary.toImage(pixelRatio: 4.0);
             ByteData? byteData =
             await imageCreation.toByteData(format: ui.ImageByteFormat.png);
             Uint8List pngBytes = byteData!.buffer.asUint8List();
