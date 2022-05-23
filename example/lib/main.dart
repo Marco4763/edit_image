@@ -37,56 +37,10 @@ class _MyAppBodyState extends State<MyAppBody> {
       heightPx: 1400,
     );
     print(controller!.selectedFilter);
-    return controller!.customScreen(
+    return controller!.defaultScreen(
         savedImage: (value){
           Navigator.pop(context);
         },
-        custom: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            leading: GestureDetector(
-              onTap: (){
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.close, color: Colors.black,),
-            ),
-            centerTitle: true,
-            title: const Text("Image", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black,),),
-            actions: [
-              GestureDetector(
-                onTap: (){
-                  print(selected);
-                },
-                child: const Icon(Icons.check, color: Colors.black,),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.white,
-          body: controller!.buildImage(selected, controller!.selectedColor),
-          bottomNavigationBar: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: 200,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                filterWidget,
-                SizedBox(height: MediaQuery.of(context).size.height*.02),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    IconButton(onPressed: (){
-                      setState(() {
-                        filterWidget = buildFilter();
-                      });
-                    }, icon: Icon(Icons.wb_sunny_outlined)),
-                  ],
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height*.02),
-              ],
-            ),
-          ),
-        )
     );
   }
 

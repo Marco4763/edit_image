@@ -54,28 +54,33 @@ class _EditImageState extends State<EditImage> {
       return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            String dir = (Platform.isIOS
-                ? await getApplicationDocumentsDirectory()
-                : await getExternalStorageDirectory())!
-                .path;
-            RenderRepaintBoundary boundary = widget.controller!.globalKey!.currentContext!
-                .findRenderObject() as RenderRepaintBoundary;
-            ui.Image imageCreation = await boundary.toImage(pixelRatio: 4.0);
-            ByteData? byteData =
-            await imageCreation.toByteData(format: ui.ImageByteFormat.png);
-            Uint8List pngBytes = byteData!.buffer.asUint8List();
-            final path =
-            join(dir, "screenshot${DateTime.now().toIso8601String()}.png");
-            File imgFile = File(path);
-            imgFile.writeAsBytes(pngBytes).then((value) async {
-              widget.savedImage!(value);
-            });
+            if(widget.controller!.imageEdited == false){
+              setState((){
+                widget.controller!.imageEdited = true;
+              });
+              String dir = (Platform.isIOS
+                  ? await getApplicationDocumentsDirectory()
+                  : await getExternalStorageDirectory())!
+                  .path;
+              RenderRepaintBoundary boundary = widget.controller!.globalKey!.currentContext!
+                  .findRenderObject() as RenderRepaintBoundary;
+              ui.Image imageCreation = await boundary.toImage(pixelRatio: 4.0);
+              ByteData? byteData =
+              await imageCreation.toByteData(format: ui.ImageByteFormat.png);
+              Uint8List pngBytes = byteData!.buffer.asUint8List();
+              final path =
+              join(dir, "screenshot${DateTime.now().toIso8601String()}.png");
+              File imgFile = File(path);
+              imgFile.writeAsBytes(pngBytes).then((value) async {
+                widget.savedImage!(value);
+              });
+            }
           },
           child: Icon(
             Icons.save,
-            color: widget.iconColor,
+            color: widget.controller!.imageEdited == true ? Colors.white : widget.iconColor,
           ),
-          backgroundColor: widget.floatingActionButtonColor,
+          backgroundColor: widget.controller!.imageEdited == true ? Colors.grey : widget.floatingActionButtonColor,
         ),
         backgroundColor: Colors.grey.shade200,
         appBar: PreferredSize(

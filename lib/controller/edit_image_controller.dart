@@ -39,6 +39,7 @@ class EditImageController extends ChangeNotifier {
     ColorFilterAddons.saturation(0),
   ]).matrix);
   Color selectedColor = Colors.transparent;
+  bool imageEdited = false;
 
   @override
   notifyListeners() {
