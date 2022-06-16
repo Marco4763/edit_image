@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:colorfilter_generator/addons.dart';
 import 'package:colorfilter_generator/colorfilter_generator.dart';
 import 'package:edit_image/edit_image.dart';
+import 'package:edit_image/resources/size.resources.dart';
 import 'package:edit_image/widgets/image.widget.dart';
 import 'package:flutter/material.dart';
 
@@ -13,14 +14,14 @@ class EditImageController extends ChangeNotifier {
     @required this.src,
     @required this.imageType,
     @required this.context,
-    this.widthPx = 1060,
-    this.heightPx = 1920,
+    this.initialWidthPx = 1080,
+    this.initialHeightPx = 1200,
   });
   final String? src;
   final ImageType? imageType;
   final BuildContext? context;
-  final int? widthPx;
-  final int? heightPx;
+  final int? initialWidthPx;
+  final int? initialHeightPx;
   double imageWidth = 0.0;
   double imageHeight = 0.0;
   GlobalKey? globalKey = GlobalKey();
@@ -176,6 +177,26 @@ class EditImageController extends ChangeNotifier {
       default:
         return Container();
     }
+  }
+
+  double getWidthExtra(BuildContext context){
+    double extra = 10;
+    for(int i=0; i<100; i++){
+      if(initialWidthPx!+extra.round() >= width(context)){
+        extra += 10;
+        break;
+      }
+    }
+    return extra;
+  }
+
+  double widthPx(BuildContext context){
+    print("Before ${initialWidthPx!} Size ${initialWidthPx!+getWidthExtra(context)} Difference ${getWidthExtra(context)}");
+    return initialWidthPx!+getWidthExtra(context);
+  }
+
+  double heightPx(BuildContext context){
+    return initialHeightPx!+getWidthExtra(context);
   }
 
   Widget buildImage(dynamic filter, dynamic color){

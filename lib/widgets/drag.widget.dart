@@ -20,10 +20,10 @@ class DragWidget extends StatefulWidget {
 }
 
 class _DragWidgetState extends State<DragWidget> {
-  double scale = 1.0;
+  double scale = 1.7;
   double oldScale = 1.0;
   bool? draggingEnded = true;
-  Offset? imagePosition = Offset.zero;
+  Offset? imagePosition = const Offset(4.0, -25);
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,7 @@ class _DragWidgetState extends State<DragWidget> {
               scale = oldScale * details.scale;
               draggingEnded = true;
               imagePosition = Offset(imagePosition!.dx+details.focalPointDelta.dx, imagePosition!.dy+details.focalPointDelta.dy);
+              print("Position ${imagePosition}");
           });
         },
         onScaleEnd: (details){

@@ -26,13 +26,13 @@ class _ImageWidgetState extends State<ImageWidget> {
     return RepaintBoundary(
       key: widget.controller!.globalKey,
       child: SizedBox(
-        width: (widget.controller!.widthPx! / pixelRatio(context)),
-        height: (widget.controller!.heightPx! / pixelRatio(context)) - 80,
+        width: (widget.controller!.widthPx(context) / pixelRatio(context)*1.5),
+        height: (widget.controller!.heightPx(context) / pixelRatio(context)) - 80,
         child: Stack(
           children: [
             SizedBox(
               width: width(context),
-              height: (widget.controller!.heightPx! / pixelRatio(context)) - 80,
+              height: (widget.controller!.heightPx(context) / pixelRatio(context)) - 80,
               child: ImageFiltered(
                 imageFilter: ui.ImageFilter.blur(
                   sigmaX: 50.0,
