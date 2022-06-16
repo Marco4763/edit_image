@@ -57,114 +57,116 @@ class _EditImageState extends State<EditImage> {
         body: SizedBox(
           width: width(context),
           height: height(context),
-          child: Column(
-            children: [
-              ImageWidget(
-                controller: widget.controller!,
-                selectedFilter: widget.controller!.selectedFilter,
-                selectedColor: widget.controller!.selectedColor,
-              ),
-              SizedBox(height: height(context) * .02),
-              Container(
-                color: Colors.grey.shade200,
-                child: DefaultTabController(
-                  initialIndex: 0,
-                  length: 2,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: height(context) * .02),
-                      const TabBar(
-                          indicatorColor: Colors.black,
-                          labelColor: Colors.black,
-                          tabs: [
-                            Tab(
-                              text: "FILTROS",
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ImageWidget(
+                  controller: widget.controller!,
+                  selectedFilter: widget.controller!.selectedFilter,
+                  selectedColor: widget.controller!.selectedColor,
+                ),
+                SizedBox(height: height(context) * .02),
+                Container(
+                  color: Colors.grey.shade200,
+                  child: DefaultTabController(
+                    initialIndex: 0,
+                    length: 2,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: height(context) * .02),
+                        const TabBar(
+                            indicatorColor: Colors.black,
+                            labelColor: Colors.black,
+                            tabs: [
+                              Tab(
+                                text: "FILTROS",
+                              ),
+                              Tab(
+                                text: "CORES",
+                              ),
+                            ]),
+                        SizedBox(
+                          width: width(context),
+                          height: height(context) / 7,
+                          child: TabBarView(children: [
+                            SizedBox(
+                              width: width(context),
+                              height: 130,
+                              child: getFilters(context, 0),
                             ),
-                            Tab(
-                              text: "CORES",
+                            SizedBox(
+                              width: width(context),
+                              height: 130,
+                              child: getFilters(context, 1),
                             ),
                           ]),
-                      SizedBox(
-                        width: width(context),
-                        height: height(context) / 7,
-                        child: TabBarView(children: [
-                          SizedBox(
-                            width: width(context),
-                            height: 130,
-                            child: getFilters(context, 0),
-                          ),
-                          SizedBox(
-                            width: width(context),
-                            height: 130,
-                            child: getFilters(context, 1),
-                          ),
-                        ]),
-                      ),
-                      SizedBox(height: height(context) * .02),
-                      SizedBox(
-                        width: width(context),
-                        height: height(context)*.1,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () async {
-                                if (widget.controller!.imageEdited == false) {
-                                  setState(() {
-                                    widget.controller!.imageEdited = true;
-                                  });
-                                  String dir = (Platform.isIOS
-                                      ? await getApplicationDocumentsDirectory()
-                                      : await getExternalStorageDirectory())!
-                                      .path;
-                                  RenderRepaintBoundary boundary = widget
-                                      .controller!.globalKey!.currentContext!
-                                      .findRenderObject() as RenderRepaintBoundary;
-                                  ui.Image imageCreation = await boundary.toImage(pixelRatio: 4.0);
-                                  ByteData? byteData = await imageCreation.toByteData(
-                                      format: ui.ImageByteFormat.png);
-                                  Uint8List pngBytes = byteData!.buffer.asUint8List();
-                                  final path = join(
-                                      dir, "screenshot${DateTime.now().toIso8601String()}.png");
-                                  File imgFile = File(path);
-                                  imgFile.writeAsBytes(pngBytes).then((value) async {
-                                    widget.savedImage!(value);
-                                  });
-                                }
-                              },
-                              child: Card(
-                                color: widget.controller!.imageEdited == true
-                                    ? Colors.grey
-                                    : Colors.white70,
-                                elevation: 0,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 16.0,
-                                    right: 7.0,
-                                    top: 4.0,
-                                    bottom: 4.0,
-                                  ),
-                                  child: Text(
-                                    "Publicar Post",
-                                    style: TextStyle(
-                                        color: widget.controller!.imageEdited == true
-                                            ? Colors.white
-                                            : widget.iconColor),
+                        ),
+                        SizedBox(height: height(context) * .02),
+                        SizedBox(
+                          width: width(context),
+                          height: height(context)*.1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  if (widget.controller!.imageEdited == false) {
+                                    setState(() {
+                                      widget.controller!.imageEdited = true;
+                                    });
+                                    String dir = (Platform.isIOS
+                                        ? await getApplicationDocumentsDirectory()
+                                        : await getExternalStorageDirectory())!
+                                        .path;
+                                    RenderRepaintBoundary boundary = widget
+                                        .controller!.globalKey!.currentContext!
+                                        .findRenderObject() as RenderRepaintBoundary;
+                                    ui.Image imageCreation = await boundary.toImage(pixelRatio: 4.0);
+                                    ByteData? byteData = await imageCreation.toByteData(
+                                        format: ui.ImageByteFormat.png);
+                                    Uint8List pngBytes = byteData!.buffer.asUint8List();
+                                    final path = join(
+                                        dir, "screenshot${DateTime.now().toIso8601String()}.png");
+                                    File imgFile = File(path);
+                                    imgFile.writeAsBytes(pngBytes).then((value) async {
+                                      widget.savedImage!(value);
+                                    });
+                                  }
+                                },
+                                child: Card(
+                                  color: widget.controller!.imageEdited == true
+                                      ? Colors.grey
+                                      : Colors.white70,
+                                  elevation: 0,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 16.0,
+                                      right: 7.0,
+                                      top: 4.0,
+                                      bottom: 4.0,
+                                    ),
+                                    child: Text(
+                                      "Publicar Post",
+                                      style: TextStyle(
+                                          color: widget.controller!.imageEdited == true
+                                              ? Colors.white
+                                              : widget.iconColor),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: width(context)*.02)
-                          ],
-                        ),
-                      )
-                    ],
+                              SizedBox(width: width(context)*.02)
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
