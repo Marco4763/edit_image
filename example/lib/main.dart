@@ -33,8 +33,8 @@ class _MyAppBodyState extends State<MyAppBody> {
       src:"https://www.slazzer.com/static/images/home-page/banner-orignal-image.jpg",
       imageType: ImageType.network,
       context: context,
-      initialWidthPx: 1080,
-      initialHeightPx: 1400,
+      initialWidthPx: 1440,
+      initialHeightPx: 1700,
     );
     print(controller!.selectedFilter);
     return controller!.defaultScreen(
