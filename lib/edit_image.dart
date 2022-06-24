@@ -148,7 +148,7 @@ class _EditImageState extends State<EditImage> {
                                       bottom: 4.0,
                                     ),
                                     child: Text(
-                                      "Publicar Post",
+                                      "Continuar",
                                       style: TextStyle(
                                           color: widget.controller!.imageEdited == true
                                               ? Colors.white
