@@ -112,6 +112,25 @@ class _EditImageState extends State<EditImage> {
                             children: [
                               GestureDetector(
                                 onTap: () async {
+                                  showDialog(
+                                      context: context!,
+                                      barrierDismissible: false,
+                                      builder: (context) => AlertDialog(
+                                        content: SizedBox(
+                                          width: width(context),
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              const CircularProgressIndicator(),
+                                              SizedBox(height: height(context) * .04),
+                                              const Text("Salvando edição",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ));
                                   if (widget.controller!.imageEdited == false) {
                                     setState(() {
                                       widget.controller!.imageEdited = true;
@@ -131,6 +150,7 @@ class _EditImageState extends State<EditImage> {
                                         dir, "screenshot${DateTime.now().toIso8601String()}.png");
                                     File imgFile = File(path);
                                     imgFile.writeAsBytes(pngBytes).then((value) async {
+                                      Navigator.of(context).pop();
                                       widget.savedImage!(value);
                                     });
                                   }
